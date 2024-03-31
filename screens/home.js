@@ -1,30 +1,20 @@
-import 'react-native-gesture-handler';
-
-
-import { Platform, StyleSheet, Text, View, StatusBar, Pressable, Image, Animated, Easing, ScrollView } from 'react-native';
-import HomeSliderTab from './navigators/homeSliderTab';
-import { NavigationContainer } from '@react-navigation/native';
-import { useCallback, useEffect, useState } from 'react';
+import { Platform, StyleSheet, Text, View, StatusBar, Pressable, Image, Animated, Easing, ScrollView, TouchableOpacity } from 'react-native';
+import HomeSliderTab from '../navigators/homeSliderTab';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 const HEADER_HEIGHT = Platform.OS == 'ios' ? 115 : 70 + StatusBar.currentHeight
-import { Asset } from 'expo-asset';
 import axios from 'axios';
 // import { image_search } from 'duckduckgo-images-api';
-import Recommmendations from './components/recommendations';
-import Promotions from './components/promotions';
-import Home from './screens/home';
-import TabNav from './navigators/bottomTab';
-export default function App() {
-  
-  const [ready, setReady] = useState(false)
-  const fadeOutAnimation = new Animated.Value(1)
-  const fadeInAnimation = new Animated.Value(0)
-  const [hidden, setHidden] = useState(false)
-  
-  const imageSources = [
-    require('./assets/propImages/blankProfile.png'),
-    require('./assets/propImages/goingplacestitle.png'),
-    require('./assets/goingplaces.png'),
-  ]
+import Recommmendations from '../components/recommendations';
+import Promotions from '../components/promotions';
+import PopularSlide from '../components/popularSlide';
+import NewestSlide from '../components/NewestSlide';
+import LuxurySlide from '../components/LuxurySlide';
+import { Dimensions } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api, { baseURL } from '../navigators/axios';
+const Home = ({navigation, route}) => {
+  const [activeTab, setActiveTab] = useState('popular')
   const [data, setData] = useState([
     {
       "ano": 2022,
@@ -1377,152 +1367,189 @@ export default function App() {
       "versao": "L"
     }
   ])
-  // let apiKey = 'AIzaSyAaRaY4zMPOZxJtOmGkajmPuBajB-JuFdE'
-  // let cx = '14739e07d7769492d'
-  // useEffect(() => {
     
-  //   let get = async () => {
-  //     data.map((d, i) => {
-  //     let q = `${d.marca} ${d.modelo} ${d.cor_exterior}`
-  
-  //       image_search({query: q})
-  //       .then(res => {
-  //       data[i].imagem = res[1] != undefined ? res[1].image : 'https://th.bing.com/th/id/OIP.B9YPCyvAuQuRZCXAuu5megHaFj?pid=ImgDet&rs=1'
-  //       console.log('=======================================================================',data)
-  //     })
-  //   })
-  // }
-  // get()
-  // .then(
-  //   console.log(data)
-  // )
-
-  // }, [])
-  // useEffect(() => {
-  //   setData(data.map(async (d) => {
-
-  //     const q = `${d.marca} ${d.modelo} ${d.versao} ${d.cor_exterior} for sale picture`
-  //     const url = `https://www.google.com/search?q=${q}&tbm=isch&qft=+filterui:aspect-square`
-  //     let image;
-  //     await new Promise(resolve => setTimeout(resolve, 3000))
-  //     axios.get(url)
-  //     .then(res => {
-  //       const $ = cheerio.load(res.data)
-  //       const images = []
-  //       $('img').each((i, ele) => {
-  //         let url = $(ele).attr('src')
-  //         if (url){
-  //           images.push(url)
-  //         }
-  //       })
-  //       console.log(images[5])
-  //       return {
-  //         ...d,
-  //         "imagem": images[5]
-  //       }
-  //       image = images[5]
-  //     })
-      
-  //   }))
-  // }, [])
-  useEffect(() => {
-      const _catchResourcesAsync = async () => {
-        
-        const imagePromises = imageSources.map((source) => {
-          return Asset.fromModule(source).downloadAsync()
+    
+    const scrollY = new Animated.Value(0)
+    const diffClampScroll = Animated.diffClamp(scrollY, 0, Platform.OS == 'android'? 100 : 95).interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, -1]
+    })
+   
+    const styles = StyleSheet.create({
+      container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        zIndex: 2
+      },
+      header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        height: 95,
+        alignItems: 'flex-end',
+        boxSizing: 'border-box',
+        paddingHorizontal: 10,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        marginBottom: 0,
+        backgroundColor: 'white',
+        zIndex: 1,
+        paddingBottom: 5,
+        transform: [{translateY: diffClampScroll}],
+        ...Platform.select({
+          android: {
+            height: 100
+          }
         })
-        await Promise.all(imagePromises)
-        Animated.timing(fadeOutAnimation, {
-          toValue: 0,
-          duration: 200,
-          easing: Easing.ease,
-          useNativeDriver: true
-        }).start(() => {
-          setReady(true)
-        })
-        
+    
+    
+        // borderBottomColor: '#80808041',
+        // borderBottomWidth: 1
+      },
+      homeTitle: {
+        flexDirection: 'row',
+        marginLeft: -15,
+        transform: [{translateX: -15}],
+      },
+      title: {
+        width: 150,
+        height: 40
+      },
+      subTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+        marginHorizontal: 10,
+        marginVertical: 20,
+      },
+      tab: {
+        fontWeight: '700',
+        width: '200%',
+        fontSize: 13,
+        color: '#2e2e2e',
+        paddingVertical: 13,
+        paddingHorizontal: 10
+
+      },
+      tab2: {
+          fontSize: 13,
+          color: '#b9b9b9',
+          fontWeight: '600',
+          paddingVertical: 13,
+          paddingHorizontal: 10
+      },
+      tabContainer: {
+        flexDirection: 'row', 
+        justifyContent: 'space-around',
       }
-      _catchResourcesAsync()
-      
-
-  }, [])
-  // useEffect(()=> {
-  //   let prepare = async () => {
-  //     console.log(ready)
-  //     await SplashScreen.preventAutoHideAsync()
-  //   }
-  //   prepare()
-  // })
-  // const onLayout = useCallback(async () => {
-  //   if (loaded){
-  //     await SplashScreen.hideAsync()
-  //   }
-  // }, [loaded])
-  const scrollY = new Animated.Value(0)
-  const diffClampScroll = Animated.diffClamp(scrollY, 0, 95).interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -1]
-  })
-  const headerY = diffClampScroll.interpolate({
-    inputRange: [0, 95],
-    outputRange: [0, -95]
-  })
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      zIndex: 2
-    },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      height: 95,
-      alignItems: 'flex-end',
-      boxSizing: 'border-box',
-      paddingHorizontal: 10,
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      marginBottom: 0,
-      backgroundColor: 'white',
-      zIndex: 1,
-      paddingBottom: 5,
-      transform: [{translateY: diffClampScroll}]
-
-  
-  
-      // borderBottomColor: '#80808041',
-      // borderBottomWidth: 1
-    },
-    homeTitle: {
-      flexDirection: 'row',
-      marginLeft: -15,
-      transform: [{translateX: -15}],
-    },
-    title: {
-      width: 150,
-      height: 40
-    },
-    subTitle: {
-      fontSize: 24,
-      fontWeight: '700',
-      marginHorizontal: 10,
-      marginVertical: 20,
+    
+    });
+    const scrollRef = useRef(null)
+    const handleTabPress = (index) => {
+      scrollRef.current.scrollTo({x: index * Dimensions.get('window').width, animated: true})
     }
-  
-  });
-  return (
-    <NavigationContainer>
-      {!ready && <Animated.View style={{flex: 1, backgroundColor: 'white', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 3, opacity: fadeOutAnimation}}>
-        <View style={{flex: 1}}>
-          <Image source={require('./assets/splash.png')} style={{flex: 1, resizeMode: 'contain', width: 'auto', height: 'auto'}}/>
+    const [profilepic, setProfile] = useState()
+    const [timestamp, setTimestamp] = useState(Date.now())
+    useFocusEffect(useCallback(() => {
+      
+      AsyncStorage.getItem('profilepic')
+      .then(res => {
+        setProfile(JSON.parse(res))
+      })
+      setTimestamp(Date.now())
+    }, []))
+    useEffect(() => {
+      AsyncStorage.getItem('profilepic')
+      .then(res => {
+        console.log(res)
+        setProfile(JSON.parse(res))
+      })
+    }, [])
+
+    return (
+        <View style={styles.container}>
+            
+            <Animated.View style={styles.header}>
+                <Pressable onPress={()=> {
+                  navigation.openDrawer()
+                }}>
+                    <View>
+                    {profilepic == null ? <Image source={require('../assets/propImages/blankprofile.jpg')}   style={{width: 40, height: 40, borderRadius: 50}}/>:    <>
+                {profilepic != null &&
+
+                <Image key={3}  style={{width: 40, height: 40, borderRadius: 50}}source={{uri: `${baseURL}${profilepic}?${timestamp}`}}/>
+                }</>}
+                    
+                    </View>
+                </Pressable>
+                <View style={styles.homeTitle}>
+                  <Image source={require('../assets/propImages/goingplacestitle.png')} style={{transform: [{translateY: -1}, {translateX: 0}], height: 32, width: 210}}/>
+                  {/* <Image style={{width: 32, height: 32, transform: [{translateY: 2}, {translateX: -5}]}} source={require('../assets/propImages/cmbdblack.png')}/><Image style={styles.title} source={require('../assets/goingplaces.png')}/> */}
+                  </View>
+                <View></View>
+            </Animated.View>
+            <Animated.ScrollView style={{ flex: 1}} nestedScrollEnabled bounces={false} onScroll={Animated.event([
+                {
+                  nativeEvent: {contentOffset: {y: scrollY}}
+                }
+              ], {useNativeDriver: true})}
+              >
+                
+                <View style={{ marginTop: 90, flex: 1}}>
+            
+                    {/* <HomeSliderTab /> */}
+                    <View style={{height: 410}}>
+                      <View style={styles.tabContainer}>
+                        <TouchableOpacity onPress={()=>{
+                          handleTabPress(0)
+                          setActiveTab('popular')}}>
+                          <Text style={activeTab == 'popular'? styles.tab : styles.tab2}>Popular</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{}} onPress={()=>{
+                          handleTabPress(1)
+                          setActiveTab('recente')}}>
+                          <Text style={activeTab == 'recente'? styles.tab : styles.tab2}>Recente</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{}} onPress={()=>{
+                          handleTabPress(2)
+                          setActiveTab('luxo')}}>
+                          <Text style={activeTab == 'luxo'? styles.tab : styles.tab2}>Luxo</Text>
+                        </TouchableOpacity>
+                      </View>
+                      {/* {
+                        activeTab == 'popular'
+                        ? <PopularSlide />
+                        : activeTab == 'recente'
+                        ? <NewestSlide />
+                        : <LuxurySlide />
+                      } */}
+                      <ScrollView ref={scrollRef} scrollEnabled={false} onScroll={(e)=> {
+
+                      }} nestedScrollEnabled={true} horizontal showsHorizontalScrollIndicator={false} pagingEnabled={true}>
+                        <View style={{width: Dimensions.get('window').width}}>
+                          <PopularSlide />
+                        </View>
+                        <View style={{width: Dimensions.get('window').width}}>
+                          <NewestSlide />
+                        </View>
+                        <View style={{width: Dimensions.get('window').width}}>
+                          <LuxurySlide />
+                        </View>
+                        
+                      </ScrollView>
+                      {/* <View style={activeTab != 'popular' ? {display: 'none'} : {height: 410}}><PopularSlide /></View>
+                      <View style={activeTab != 'recente' ? {display: 'none'} : {height: 410}}><NewestSlide /></View>
+                      <View style={activeTab != 'luxo' ? {display: 'none'} : {height: 410}}><LuxurySlide /></View> */}
+                    </View>
+            
+                  <Text style={styles.subTitle}>Promoções Activas</Text>
+                  <Promotions />
+                  <Text style={styles.subTitle}>Recomendações</Text>
+                  <Recommmendations />
+                </View>
+            
+              </Animated.ScrollView>
         </View>
-      </Animated.View>}
-     <TabNav />
-    </NavigationContainer>
-  );
-  
+    )
 }
-
-
+export default Home

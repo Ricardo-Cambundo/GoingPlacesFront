@@ -1,30 +1,23 @@
-import 'react-native-gesture-handler';
-
-
-import { Platform, StyleSheet, Text, View, StatusBar, Pressable, Image, Animated, Easing, ScrollView } from 'react-native';
-import HomeSliderTab from './navigators/homeSliderTab';
-import { NavigationContainer } from '@react-navigation/native';
-import { useCallback, useEffect, useState } from 'react';
-const HEADER_HEIGHT = Platform.OS == 'ios' ? 115 : 70 + StatusBar.currentHeight
-import { Asset } from 'expo-asset';
-import axios from 'axios';
-// import { image_search } from 'duckduckgo-images-api';
-import Recommmendations from './components/recommendations';
-import Promotions from './components/promotions';
-import Home from './screens/home';
-import TabNav from './navigators/bottomTab';
-export default function App() {
+import { LinearGradient } from "expo-linear-gradient"
+import { useEffect, useState } from "react"
+import { Animated, Image, Pressable, StyleSheet, Platform, TextInput, Modal } from "react-native"
+import { FlatList } from "react-native"
+import { Text } from "react-native"
+import { View } from "react-native"
+import Icon from "react-native-vector-icons/Ionicons"
+import StarReview from "react-native-stars"
+import { useNavigation } from "@react-navigation/native"
+import { TouchableWithoutFeedback } from "react-native"
+import Search1 from "./search!"
+const Search = () => {
+  const scrollY = new Animated.Value(0)
   
-  const [ready, setReady] = useState(false)
-  const fadeOutAnimation = new Animated.Value(1)
-  const fadeInAnimation = new Animated.Value(0)
-  const [hidden, setHidden] = useState(false)
-  
-  const imageSources = [
-    require('./assets/propImages/blankProfile.png'),
-    require('./assets/propImages/goingplacestitle.png'),
-    require('./assets/goingplaces.png'),
-  ]
+  const navigation = useNavigation()
+  const diffClampScroll = Animated.diffClamp(scrollY, 0, Platform.OS == 'android'? 100 : 95).interpolate({
+  inputRange: [0, 1],
+  outputRange: [0, -1]
+  })
+  //prop data
   const [data, setData] = useState([
     {
       "ano": 2022,
@@ -61,7 +54,7 @@ export default function App() {
       "cor_interior": "Preto",
       "disponivel": true,
       "id": 8,
-      "imagem": "https://s1.1zoom.me/big0/661/Mercedes-Benz_AMG_C-Class_C205_Silver_color_Coupe_554990_1280x640.jpg",
+      "imagem": "https://th.bing.com/th/id/OIP.fw31fRu8t27qeuT2MThf1QHaDt?pid=ImgDet&rs=1",
       "marca": "Mercedes-Benz",
       "modelo": "C-Class",
       "motor": "4 cilindros 2.0L",
@@ -142,7 +135,7 @@ export default function App() {
       "cor_interior": "Cinza",
       "disponivel": true,
       "id": 13,
-      "imagem": "http://www.pngpix.com/wp-content/uploads/2016/06/PNGPIX-COM-Lexus-RX-350-F-White-Car-PNG-Image.png",
+      "imagem": "https://th.bing.com/th/id/R.61a7cc10ee204111bc08af1dfafc6f13?rik=AqA8zt1KEv8T2g&riu=http%3a%2f%2fwww.car-revs-daily.com%2fwp-content%2fuploads%2f2015%2f11%2f2016-Lexus-RX350-Eminent-White-Pearl-41.jpg&ehk=sD2gODToU9DmIffMLpS82yJmqc3DWgK2dq1ShKB0h80%3d&risl=&pid=ImgRaw&r=0",
       "marca": "Lexus",
       "modelo": "RX",
       "motor": "V6 3.5L",
@@ -277,7 +270,7 @@ export default function App() {
       "cor_interior": "Cinza",
       "disponivel": true,
       "id": 24,
-      "imagem": "http://www.pngpix.com/wp-content/uploads/2016/06/PNGPIX-COM-Lexus-RX-350-F-White-Car-PNG-Image.png",
+      "imagem": "https://th.bing.com/th/id/R.61a7cc10ee204111bc08af1dfafc6f13?rik=AqA8zt1KEv8T2g&riu=http%3a%2f%2fwww.car-revs-daily.com%2fwp-content%2fuploads%2f2015%2f11%2f2016-Lexus-RX350-Eminent-White-Pearl-41.jpg&ehk=sD2gODToU9DmIffMLpS82yJmqc3DWgK2dq1ShKB0h80%3d&risl=&pid=ImgRaw&r=0",
       "marca": "Lexus",
       "modelo": "RX",
       "motor": "3.5L V6",
@@ -709,7 +702,7 @@ export default function App() {
       "cor_interior": "Cinza",
       "disponivel": true,
       "id": 55,
-      "imagem": "https://img2.carmax.com/img/vehicles/18333173/1/385.jpg",
+      "imagem": "https://th.bing.com/th/id/OIP.rPUw89AH52-cqvaXo7mwBQHaFj?rs=1&pid=ImgDetMain",
       "marca": "Jeep",
       "modelo": "Cherokee",
       "motor": "4 cilindros 2.4L",
@@ -844,7 +837,7 @@ export default function App() {
       "cor_interior": "Preto",
       "disponivel": true,
       "id": 14,
-      "imagem": "https://s1.1zoom.me/b4453/477/Mazda_2017_CX-5_Red_Metallic_552776_1366x768.jpg",
+      "imagem": "https://i0.wp.com/www.themummychronicles.com/wp-content/uploads/2017/08/DSC_2010.jpg?resize=3273%2C2191",
       "marca": "Mazda",
       "modelo": "CX-5",
       "motor": "4 cilindros 2.5L",
@@ -898,7 +891,7 @@ export default function App() {
       "cor_interior": "Preto",
       "disponivel": true,
       "id": 19,
-      "imagem": "https://s1.1zoom.me/b5050/426/KIA_2016_Optima_Sportswagon_GT_Line_Wine_color_537195_1920x1200.jpg",
+      "imagem": "https://media.whatcar.com/450x299/migration/reviews/a99839424e949a83e7b077283a784fa6e40f2f73.jpg",
       "marca": "Kia",
       "modelo": "Optima",
       "motor": "2.5L 4-cilindros",
@@ -1070,7 +1063,7 @@ export default function App() {
       "quilometragem": "6,000 milhas",
       "recursos": [
         "Bancos de Couro",
-        "Sistema de Entretenimento Traseiro",
+        "Tela Touchscreen",
         "Teto Solar Elétrico"
       ],
       "tipo_de_combustivel": "Gasolina",
@@ -1377,101 +1370,157 @@ export default function App() {
       "versao": "L"
     }
   ])
-  // let apiKey = 'AIzaSyAaRaY4zMPOZxJtOmGkajmPuBajB-JuFdE'
-  // let cx = '14739e07d7769492d'
-  // useEffect(() => {
-    
-  //   let get = async () => {
-  //     data.map((d, i) => {
-  //     let q = `${d.marca} ${d.modelo} ${d.cor_exterior}`
   
-  //       image_search({query: q})
-  //       .then(res => {
-  //       data[i].imagem = res[1] != undefined ? res[1].image : 'https://th.bing.com/th/id/OIP.B9YPCyvAuQuRZCXAuu5megHaFj?pid=ImgDet&rs=1'
-  //       console.log('=======================================================================',data)
-  //     })
-  //   })
-  // }
-  // get()
-  // .then(
-  //   console.log(data)
-  // )
+  const brands = [
+    {
+      id: 1,
+      name: 'BMW',
+      image: 'https://cdn.iconscout.com/icon/free/png-512/free-bmw-2-202742.png?f=webp&w=256',
+      data: data.slice(19, 27)
+    },
+    {
+      id: 2,
+      name: 'Toyota',
+      image: 'https://cdn.iconscout.com/icon/free/png-512/free-toyota-3441138-2874672.png?f=webp&w=256',
+      data: data.slice(3, 12)
+    },
+    {
+      id: 2.5,
+      name: 'Volkswagen',
+      image: 'https://cdn.iconscout.com/icon/free/png-512/free-volkswagen-3441227-2874332.png?f=webp&w=256',
+      data: data.slice(33, 40)
+    },
+    {
+      id: 3,
+      name: 'Mazda',
+      image: 'https://cdn.iconscout.com/icon/free/png-512/free-mazda-3-827488.png?f=webp&w=256',
+      data: data.slice(14, 23)
+    }, 
+    {
+      id: 4, 
+      name: 'Hyundai',
+      image: 'https://cdn.iconscout.com/icon/free/png-512/free-hyundai-3441179-2874284.png?f=webp&w=256',
+      data: data.slice(1, 10)
+    }, 
+    {
+      id: 5,
+      name: 'Subaru',
+      image: 'https://www.decalup.com/wp-content/uploads/2020/05/Subaru_Logo--1536x831.png',
+      data: data.slice(20, 30)
+    }, 
+    {
+      id: 6, 
+      name: 'Jeep',
+      image: 'https://dreww.ca/wp-content/uploads/2021/08/logo-jeep.png'
+    }, 
+    {
+      id: 7,
+      name: 'Lexus',
+      image: 'https://cdn.iconscout.com/icon/free/png-512/free-lexus-7-827477.png?f=webp&w=256',
+    },
+    {
+      id: 8,
+      name: 'Nissan',
+      image: "https://d1y00uvtppodtq.cloudfront.net/wp-content/uploads/2020/07/20071442/Nissan-Logo.png"
+    },
+    {
+      id: 9,
+      name: 'Dodge',
+      image: 'https://cdn.iconscout.com/icon/free/png-512/free-dodge-1863641-1581236.png?f=webp&w=256'
+    },
+    {
+      id: 10,
+      name: 'Mini',
+      image: 'https://cdn.iconscout.com/icon/free/png-512/free-bmw-1-202737.png?f=webp&w=256'
+    }
 
-  // }, [])
-  // useEffect(() => {
-  //   setData(data.map(async (d) => {
-
-  //     const q = `${d.marca} ${d.modelo} ${d.versao} ${d.cor_exterior} for sale picture`
-  //     const url = `https://www.google.com/search?q=${q}&tbm=isch&qft=+filterui:aspect-square`
-  //     let image;
-  //     await new Promise(resolve => setTimeout(resolve, 3000))
-  //     axios.get(url)
-  //     .then(res => {
-  //       const $ = cheerio.load(res.data)
-  //       const images = []
-  //       $('img').each((i, ele) => {
-  //         let url = $(ele).attr('src')
-  //         if (url){
-  //           images.push(url)
-  //         }
-  //       })
-  //       console.log(images[5])
-  //       return {
-  //         ...d,
-  //         "imagem": images[5]
-  //       }
-  //       image = images[5]
-  //     })
+  ]
+  const [categories, setCategories] = useState([
+    {
+      id: 1,
+      name: 'Sedan',
+      image: require('../assets/propImages/sedan.png'),
+      colors: ['#c7c7c7', '#f5f5f5'],
+      data: data.slice(0, 11),
+    },
+    {
+      id: 1.5,
+      name: 'SUV',
+      image: require('../assets/propImages/suv.png'),
+      colors: ['#7c4f42', '#fc9348'],
+      data: data.slice(11, 21).concat(data.slice(7, 10)),
+    },
+    {
+      id: 2,
+      name: 'Van',
+      image: require('../assets/propImages/van.png'),
+      colors: ['#2c2c2c','#6d6d6d'],
+      data: data.slice(21, 31).concat(data.slice(0, 5)),
+    }, 
+    {
+      id: 3,
+      name: 'Carrinha',
+      image: require('../assets/propImages/pickup.png'),
+      colors: ['#c62025','#f36269'],
+      data: data.slice(31, 41),
       
-  //   }))
-  // }, [])
-  useEffect(() => {
-      const _catchResourcesAsync = async () => {
-        
-        const imagePromises = imageSources.map((source) => {
-          return Asset.fromModule(source).downloadAsync()
-        })
-        await Promise.all(imagePromises)
-        Animated.timing(fadeOutAnimation, {
-          toValue: 0,
-          duration: 200,
-          easing: Easing.ease,
-          useNativeDriver: true
-        }).start(() => {
-          setReady(true)
-        })
-        
-      }
-      _catchResourcesAsync()
-      
+    },
+    {
+      id: 4,
+      name: 'Camião',
+      image: require('../assets/propImages/truck.png'),
 
-  }, [])
-  // useEffect(()=> {
-  //   let prepare = async () => {
-  //     console.log(ready)
-  //     await SplashScreen.preventAutoHideAsync()
-  //   }
-  //   prepare()
-  // })
-  // const onLayout = useCallback(async () => {
-  //   if (loaded){
-  //     await SplashScreen.hideAsync()
-  //   }
-  // }, [loaded])
-  const scrollY = new Animated.Value(0)
-  const diffClampScroll = Animated.diffClamp(scrollY, 0, 95).interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -1]
-  })
-  const headerY = diffClampScroll.interpolate({
-    inputRange: [0, 95],
-    outputRange: [0, -95]
-  })
+      colors: ['#0379d3','#69b8ec'],
+      data: data.slice(0, 4).concat(data.slice(7, 20))
+    },
+    {
+      id: 5,
+      name:'Conversível',
+      image: require('../assets/propImages/convertible.png'),
+
+      colors: ['#c78f0b','#f8c132'],
+      data: data.slice(30, 40).concat(data.slice(0, 9))
+    }
+  ])
+  const [dealers, setDealers] = useState([
+    {
+      id: 1,
+      name: 'GearX Nova Vida',
+      stars: 3.5,
+      offers: 3,
+      local: 'Nova Vida',
+      image: 'https://th.bing.com/th/id/R.f32bdc94ae794ac26628b26b11bfb820?rik=d3GwLCX6otjRDw&pid=ImgRaw&r=0'
+    },
+    {
+      id: 2,
+      name: 'Carla Cambundo',
+      stars: 4,
+      offers: 2,
+      local: 'Camama',
+      image: 'https://ent-nts.ca/c/ecolenationaletheatre/uploads/zva_bank_img.file/Audrey-Dwyer-Colour-Cylla-Von-Tiedemann-NTS-565.jpg'
+    },
+    {
+      id: 3,
+      name: 'Izeste',
+      stars: 4.5,
+      offers: 7,
+      local: 'Camama, BPC',
+      image: 'https://i.pinimg.com/originals/92/08/fc/9208fcff00e5e72ea710d4dbab7b2310.png'
+    },
+    {
+      id: 4,
+      name: 'RentACar-Kilamba',
+      stars: 3.5,
+      offers: 5,
+      local: 'Camama, Jardim de Rosas, Fase 2',
+      image: 'https://seeklogo.com/images/R/RAC-logo-D83A5948CC-seeklogo.com.png'
+    },
+  ])
   const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      zIndex: 2
+        flex: 1,
+        backgroundColor: '#fff',
+        zIndex: 2
     },
     header: {
       flexDirection: 'row',
@@ -1488,8 +1537,13 @@ export default function App() {
       backgroundColor: 'white',
       zIndex: 1,
       paddingBottom: 5,
-      transform: [{translateY: diffClampScroll}]
-
+      transform: [{translateY: diffClampScroll}],
+      ...Platform.select({
+        android: {
+          height: 100
+        }
+      }),
+      
   
   
       // borderBottomColor: '#80808041',
@@ -1509,20 +1563,362 @@ export default function App() {
       fontWeight: '700',
       marginHorizontal: 10,
       marginVertical: 20,
+    },
+    input: {
+      flex: 1,
+      width: '95%',
+      backgroundColor: '#dbdbdb44',
+      height: 40,
+      marginLeft: 10,
+      borderRadius: 10,
+      flexDirection: 'row',
+      paddingHorizontal: 7
+    },
+    textInput: {
+      flex: 1,
+      fontSize: 15,
+      borderWidth: 0,
+      paddingLeft: 5,
+      alignSelf: 'center',
+      color: '#a8a8a8',
+    },
+    options: {
+      height: 40,
+      width: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#008cff',
+      borderRadius: 7
+    },
+    mapView: {
+      height: 180,
+      backgroundColor: 'white',
+      marginHorizontal: 10,
+      alignItems: 'center',
+      borderRadius: 10,
+      shadowColor: 'black',
+      shadowRadius: 4,
+      shadowOpacity: 0.1,
+      shadowOffset: {width: 0, height: 0},
+      elevation: 2,
+    },
+    map: {
+      width: '100%',
+      height: 180,
+      alignSelf: 'center',
+      resizeMode: 'cover',
+      borderRadius: 10,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: '700',
+      marginHorizontal: 10,
+      marginVertical: 20,
+    },
+    brand: {
+      
+      // backgroundColor: '#ececec',
+      // elevation: 4,
+      // shadowColor: 'black',
+      // shadowRadius: 2,
+      // shadowOpacity: 0.1,
+      // shadowOffset: {width: 0, height: 0},
+      marginVertical: 2,
+      // backgroundColor: 'black',
+      marginTop: -10,
+      marginBottom: -8,
+      paddingVertical: 10,
+      width: 85
+    },
+    brandName: {
+      fontSize: 13,
+      textAlign: 'center',
+      fontWeight: '700',
+      marginTop: 8
+    },
+    brandImage: {
+      width: 35,
+      height: 35,
+      resizeMode: 'contain',
+      alignSelf: 'center',
+    },
+    show: {
+      
+      justifyContent: 'center',
+      paddingHorizontal: 10,
+      paddingRight: 20,
+      marginTop: -18
+    },
+    icon: {
+        color: '#007bee'
+    },
+    category: {
+      width: '47%',
+      height: 155,
+      marginVertical: 10,
+      borderRadius: 15,
+      paddingHorizontal: 5
+    },
+    categories: {
+      paddingHorizontal: 10,
+      gap: 10,
+      justifyContent: 'space-around'
+      
+    },
+    categoryImage: {
+      width: '100%',
+      height: 150,
+      resizeMode: 'contain'
+    },
+    categoryName: {
+      color: 'white',
+      fontSize: 16,
+      textTransform: 'uppercase',
+      fontWeight: '900',
+
+    },
+    categoryItems: {
+      color: 'white',
+      fontWeight: '600',
+      marginTop: -3,
+      fontSize: 12
+      
+      
+    },
+    dealer: {
+      backgroundColor: 'white',
+      marginHorizontal: 10,
+      marginVertical: 10,
+      height: 80,
+      padding: 5,
+      borderTopLeftRadius: 15,
+      borderBottomRightRadius: 15,
+      flexDirection: 'row',
+      paddingLeft: 10,
+      elevation: 4,
+      shadowColor: 'black',
+      shadowRadius: 2,
+      shadowOpacity: 0.1,
+      shadowOffset: {width: 0, height: 0},
+    },
+    dealerImage: {
+      width: 55,
+      height: 55,
+      borderRadius: 15,
+      alignSelf: 'center',
+      
+    },
+    dealerInfo: {
+      marginLeft: 10,
+      paddingVertical: 8,
+      justifyContent: 'space-around'
+      
+    },
+    dealerName: {
+      fontSize: 15,
+      fontWeight: '800'
+    },
+    dealerLocal: {
+      color: 'grey',
+      fontWeight: '600',
+      fontSize: 13
+    },
+    dealerInfo2: {
+      justifyContent: 'space-around',
+      alignItems: 'flex-end'
+      
+    },
+    dealerRating: {
+      color: '#008cff',
+      fontWeight: '500',
+      fontSize: 13
     }
   
-  });
-  return (
-    <NavigationContainer>
-      {!ready && <Animated.View style={{flex: 1, backgroundColor: 'white', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 3, opacity: fadeOutAnimation}}>
+  })
+  const [open, setOpen] = useState(false)
+    return (
         <View style={{flex: 1}}>
-          <Image source={require('./assets/splash.png')} style={{flex: 1, resizeMode: 'contain', width: 'auto', height: 'auto'}}/>
+          <Modal visible={open} animationType="slide">
+            <Search1 setSearch={()=> {
+              setOpen(false)
+            }}/>
+          </Modal>
+            <Animated.View style={styles.header}>
+                <Pressable>
+                    <View>
+                    <Image style={{width: 40, height: 40, borderRadius: 50}} source={require('../assets/propImages/blankProfile.png')} />
+                    </View>
+                </Pressable>
+                <TouchableWithoutFeedback onPress={()=>{
+                  setOpen(true)
+                }}>
+                  <View style={styles.input}><Icon name='search' size={20} style={{color: '#008cffb4', alignSelf: 'center', }}/><Text ellipsizeMode="tail" numberOfLines={1} style={styles.textInput}>Municípios, bairros, centralidades, outros endereço </Text></View>
+                </TouchableWithoutFeedback>
+                <TouchableWithoutFeedback onPress={()=>{
+                  setOpen(true)
+                }}>
+                  <View style={styles.options}><Icon color='white' name='options' size={28}/></View>
+                </TouchableWithoutFeedback>
+            </Animated.View>
+            <Animated.ScrollView style={{ flex: 1, backgroundColor: 'white'}} nestedScrollEnabled bounces={false} onScroll={Animated.event([
+                {
+                  nativeEvent: {contentOffset: {y: scrollY}}
+                }
+              ], {useNativeDriver: true})}>
+
+
+              <View style={{flex: 1, marginTop: 90}}>
+                
+                <Text style={styles.title}>Marcas Disponíveis</Text>
+                {/* <FlatList horizontal showsHorizontalScrollIndicator={false} data={brands.slice(0, 6).concat([ {
+      id: 0,
+      name: 'seeAll'
+    }])} renderItem={(item) => {
+                  if (item.item.name == 'seeAll'){
+                    return (
+                      <View style={styles.show}><View style={{ backgroundColor: '#007bee38', borderRadius: 50, padding: 10, width: 60, height: 60}}><Icon style={styles.icon} name='arrow-forward-outline' size={40}/></View></View>
+                  )
+                  }
+                  return (
+                    <TouchableWithoutFeedback onPress={() => {
+                      
+                        let d = data.filter((d) => d.marca == item.item.name)
+                        if (d.length == 0){
+                          d = item.item.data
+                        }
+                    
+                      navigation.navigate('category', {
+                        title: item.item.name,
+                        data: d,
+                        section: 'brand'
+                      })
+                    }}>
+                    <View style={[styles.brand, {}]}>
+                      <View style={{backgroundColor: '#ececec', padding: 40, borderRadius: 50, width: 65, height: 65, alignItems: 'center', justifyContent: 'center', alignSelf: 'center'
+}}><Image style={styles.brandImage} source={{uri: item.item.image}}/></View>
+                      <Text style={styles.brandName}>{item.item.name}</Text>
+                    </View>
+                    </TouchableWithoutFeedback>
+                  )
+                }}/> */}
+                
+              <View style={{gap: 16}}>
+              <FlatList contentContainerStyle={{ justifyContent: 'space-around', width: '100%'}}  horizontal showsHorizontalScrollIndicator={false} data={brands.slice(0, 4)} renderItem={(item) => {
+                  
+                  return (
+                    <TouchableWithoutFeedback onPress={() => {
+                      
+                        let d = data.filter((d) => d.marca == item.item.name)
+                        if (d.length == 0){
+                          d = item.item.data
+                        }
+                    
+                      navigation.navigate('category', {
+                        title: item.item.name,
+                        data: d,
+                        section: 'brand'
+                      })
+                    }}>
+                    <View style={[styles.brand, {}]}>
+                      <View style={{backgroundColor: '#ececec', padding: 35, borderRadius: 50, width: 40, height: 40, alignItems: 'center', justifyContent: 'center', alignSelf: 'center'
+}}><Image style={styles.brandImage} source={{uri: item.item.image}}/></View>
+                      <Text style={styles.brandName}>{item.item.name}</Text>
+                    </View>
+                    </TouchableWithoutFeedback>
+                  )
+                }}/>
+                <FlatList contentContainerStyle={{ justifyContent: 'space-around', width: '100%'}} 
+                 horizontal showsHorizontalScrollIndicator={false} data={brands.slice(4, 7).concat([ {
+                  id: 0,
+                  name: 'seeAll',
+                  image: 'https://th.bing.com/th/id/R.e055341839db490813036a5f21515c8b?rik=ia61jogLoe8ZUA&riu=http%3a%2f%2fcdn.onlinewebfonts.com%2fsvg%2fimg_400634.png&ehk=wP2Ll3DBP2U5VWpKtERnizFjUav5AOt%2fpQZ%2bJGtv5%2fc%3d&risl=&pid=ImgRaw&r=0'
+                }])} renderItem={(item) => {
+                  if (item.item.name == 'seeAll'){
+                    return (
+                      <View style={styles.brand}>
+                        <View style={{backgroundColor: '#ececec', padding: 35, borderRadius: 50, width: 40, height: 40, alignItems: 'center', justifyContent: 'center', alignSelf: 'center'
+}}><Image style={[styles.brandImage, {width:27, height: 27}]} source={{uri: item.item.image}}/></View>
+                      <Text style={styles.brandName}>Ver mais</Text>
+                      </View>
+                  )
+                  }
+                  return (
+                    <TouchableWithoutFeedback onPress={() => {
+                      
+                        let d = data.filter((d) => d.marca == item.item.name)
+                        if (d.length == 0){
+                          d = item.item.data
+                        }
+                    
+                      navigation.navigate('category', {
+                        title: item.item.name,
+                        data: d,
+                        section: 'brand'
+                      })
+                    }}>
+                    <View style={[styles.brand, {}]}>
+                      <View style={{backgroundColor: '#ececec', padding: 35, borderRadius: 50, width: 40, height: 40, alignItems: 'center', justifyContent: 'center', alignSelf: 'center'
+}}><Image style={styles.brandImage} source={{uri: item.item.image}}/></View>
+                      <Text style={styles.brandName}>{item.item.name}</Text>
+                    </View>
+                    </TouchableWithoutFeedback>
+                  )
+                }}/>
+              </View>
+              <Text style={styles.title}>Mapa</Text>
+
+              <View style={styles.mapView}>
+                <Image style={styles.map} source={require('../assets/propImages/propMap.png')}/>
+              </View>
+
+                <Text style={styles.title}>Categorias Populares</Text>
+                <FlatList columnWrapperStyle={styles.categories}  keyExtractor={(item) => item.id} numColumns={2} data={categories} renderItem={(item) => {
+                  return (
+                    <TouchableWithoutFeedback onPress={()=>navigation.navigate('category', {
+                      title: item.item.name,
+                      data: item.item.data,
+                      section: 'category'
+                    })}>
+                    <LinearGradient colors={item.item.colors} start={{x: 0, y: 0}} end={{x: 1, y: 0}} style={[styles.category]}>
+                      <Image style={styles.categoryImage} source={item.item.image}/>
+                      <View style={{transform: [{translateY: -38}, {translateX: 10}],
+}}>
+                      <Text style={styles.categoryName}>{item.item.name}</Text>
+                      <Text style={styles.categoryItems}>{item.item.data.length} carros</Text>
+                      </View>
+                    </LinearGradient>
+                    </TouchableWithoutFeedback>
+                  )
+                }}/>
+
+                <Text style={styles.title}>Top Locadores</Text>
+                <FlatList data={dealers} renderItem={(item)=> {
+                  return (
+                    <View style={styles.dealer}>
+                      <Image style={styles.dealerImage} source={{uri: item.item.image}}/>
+
+                      <View style={styles.dealerInfo}>
+                        <Text style={styles.dealerName}>{item.item.name}</Text>
+                        <Text style={styles.dealerLocal}>{item.item.local}</Text>
+                      </View>
+                      <View style={{flex: 1, justifyContent: 'space-between', flexDirection: 'row'}}>
+                      <View></View>
+                      <View style={styles.dealerInfo2}>
+                        
+                        <StarReview rating={item.item.stars} count={5} half={false} fullStar={<Icon name='star' color='#007bee' size={17}/>}
+                        halfStar={<Icon name='star-half' color='#007bee' size={17}/>}
+                        emptyStar={<Icon name='star' color='#d1d1d1' size={17}/>}/>
+                        <Text style={styles.dealerRating}>{item.item.offers} carro{`${item.item.offers > 1 ? 's' : ''}`}</Text>
+                      </View>
+                      </View>
+                    </View>
+                  )
+                }}/>
+              </View>
+              
+            </Animated.ScrollView>
         </View>
-      </Animated.View>}
-     <TabNav />
-    </NavigationContainer>
-  );
-  
+    )
 }
 
-
+export default Search
